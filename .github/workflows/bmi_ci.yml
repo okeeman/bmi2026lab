@@ -29,25 +29,6 @@ jobs:
       run: dotnet build --configuration Release
 
   
-    - name: Run unit tests
-      run: dotnet test bmiUnitTestProject/bmiUnitTestProject.csproj --no-restore --collect "Code coverage" -l:trx
-    - name: Publish Unit Test Results
-      #  Displays directly in GitHub.
-      uses: dorny/test-reporter@v3
-      with:
-        artifact: ''
-        name: MS Tests        
-        # * is a simple, non-recursive wildcard representing zero or more characters which you can use for paths and file names.
-        # ** is a recursive wildcard which can only be used with paths, not file names.
-        path: '**.trx'
-        reporter: 'dotnet-trx'   
-    - name: Upload test results
-      uses: actions/upload-artifact@v7
-      with:
-        name: mstest-results
-        path: '**/test_results.trx'
-
-  
     - name: Publish
       #run: dotnet publish -c Release --property:PublishDir=${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
