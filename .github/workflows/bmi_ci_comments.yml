@@ -31,7 +31,7 @@ jobs:
   ################################################
   build:     
     ################################################
-    # Specify runner OS.
+    # 💻 Specify runner OS.
     ################################################      
     runs-on: windows-latest   
     
@@ -40,13 +40,13 @@ jobs:
     ################################################     
     steps:
     ################################################
-    # Checkout code.
+    # ️⬇️ Checkout code.
     ################################################
     - name: Checkout code.                            
       uses: actions/checkout@v5
       
     ################################################
-    # Set up .NET.
+    # ⬇️ Set up .NET.
     ################################################
     - name: Set up .NET                                 
       uses: actions/setup-dotnet@v5
@@ -54,13 +54,38 @@ jobs:
         dotnet-version: 10.0.x
         
     ################################################
-    # Build for Release.
+    # 🧱 Build for Release.
     ################################################
     - name: Build for Release                          
       run: dotnet build --configuration Release
+    
+    ################################################
+    # 🧪 Unit tests.
+    ################################################
+    - name: Run unit tests
+      run: dotnet test bmiUnitTestProject/bmiUnitTestProject.csproj --no-restore --collect "Code coverage" -l:trx
+    - name: Publish Unit Test Results
+      #  Displays directly in GitHub.
+      uses: dorny/test-reporter@v3
+      with:
+        artifact: ''
+        name: MS Tests        
+        # * is a simple, non-recursive wildcard representing zero or more characters which you can use for paths and file names.
+        # ** is a recursive wildcard which can only be used with paths, not file names.
+        path: '**.trx'
+        reporter: 'dotnet-trx'   
+        
+    ################################################
+    # ⬆️ Upload test results.
+    ################################################
+    - name: Upload test results
+      uses: actions/upload-artifact@v7
+      with:
+        name: mstest-results
+        path: '**/test_results.trx'
 
     #####################################################
-    # Publish the app, i.e., create a deployment package.
+    # 📘 Publish the app, i.e., create a deployment package.
     #####################################################
     - name: Publish
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" `
@@ -69,7 +94,7 @@ jobs:
       --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
     
     #############################################################
-    # Deploy to Azure Web apps using publish profile credentials.
+    # ☁️ Deploy to Azure Web apps using publish profile credentials.
     #############################################################
     - name: Run Azure webapp deploy action using publish profile credentials
       uses: azure/webapps-deploy@v2
