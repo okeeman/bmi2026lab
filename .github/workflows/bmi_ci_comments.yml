@@ -66,7 +66,7 @@ jobs:
     ################################################
     - name: Run unit tests
       run: >
-        dotnet test bmiUnitTestProject/BMI_Unit_Test.csproj 
+        dotnet test BMI_Unit_Test/BMI_Unit_Test.csproj 
         --no-restore 
         --collect "Code coverage" -l:trx
     
