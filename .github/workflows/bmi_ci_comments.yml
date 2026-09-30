@@ -1,0 +1,82 @@
+################################################
+# Workflow name.
+################################################
+name: BMI_CI                                            
+
+
+################################################
+# Define environment variables.
+################################################
+env:
+  AZURE_WEBAPP_NAME: bmi202620260925161550             
+  AZURE_WEBAPP_PACKAGE_PATH: 'bmi2021\published'        
+  ACTIONS_STEP_DEBUG: true
+  ACTIONS_RUNNER_DEBUG: true
+  CONFIGURATION: Release
+  WORKING_DIRECTORY: bmi2021
+
+
+################################################
+# When is the workflow triggered.
+################################################
+on:
+ workflow_dispatch:                                     
+ push:                                             
+   branches: [ master ]
+ 
+
+jobs:
+  ################################################
+  # build job.
+  ################################################
+  build:     
+    ################################################
+    # Specify runner OS.
+    ################################################      
+    runs-on: windows-latest   
+    
+    ################################################
+    # Steps in the build job.
+    ################################################     
+    steps:
+    ################################################
+    # Checkout code.
+    ################################################
+    - name: Checkout code.                            
+      uses: actions/checkout@v5
+      
+    ################################################
+    # Set up .NET.
+    ################################################
+    - name: Set up .NET                                 
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.0.x
+        
+    ################################################
+    # Build for Release.
+    ################################################
+    - name: Build for Release                          
+      run: dotnet build --configuration Release
+
+    #####################################################
+    # Publish the app, i.e., create a deployment package.
+    #####################################################
+    - name: Publish
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" `
+      --configuration ${{ env.CONFIGURATION }} `
+      --no-build `
+      --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+    
+    #############################################################
+    # Deploy to Azure Web apps using publish profile credentials.
+    #############################################################
+    - name: Run Azure webapp deploy action using publish profile credentials
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}                         
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} 
+        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}' 
+       
+
+
