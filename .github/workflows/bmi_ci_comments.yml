@@ -57,21 +57,27 @@ jobs:
     # 🧱 Build for Release.
     ################################################
     - name: Build for Release                          
-      run: dotnet build --configuration Release
+      run: >
+        dotnet build 
+        --configuration Release
     
     ################################################
     # 🧪 Unit tests.
     ################################################
     - name: Run unit tests
-      run: dotnet test bmiUnitTestProject/bmiUnitTestProject.csproj --no-restore --collect "Code coverage" -l:trx
+      run: >
+        dotnet test bmiUnitTestProject/BMI_Unit_Test.csproj 
+        --no-restore 
+        --collect "Code coverage" -l:trx
+    
+    ################################################
+    # 📘 Publish unit tests.
+    ################################################
     - name: Publish Unit Test Results
-      #  Displays directly in GitHub.
       uses: dorny/test-reporter@v3
       with:
         artifact: ''
         name: MS Tests        
-        # * is a simple, non-recursive wildcard representing zero or more characters which you can use for paths and file names.
-        # ** is a recursive wildcard which can only be used with paths, not file names.
         path: '**.trx'
         reporter: 'dotnet-trx'   
         
@@ -101,7 +107,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with: 
         app-name: ${{ env.AZURE_WEBAPP_NAME }}                         
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} 
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} 
         package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}' 
        
 
