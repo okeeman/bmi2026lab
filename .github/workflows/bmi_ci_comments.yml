@@ -63,10 +63,11 @@ jobs:
     # Publish the app, i.e., create a deployment package.
     #####################################################
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" `
-      --configuration ${{ env.CONFIGURATION }} `
-      --no-build `
-      --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+      run: >
+        dotnet publish "${{ env.WORKING_DIRECTORY }}" 
+        --configuration ${{ env.CONFIGURATION }} 
+        --no-build 
+        --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
     
     #############################################################
     # Deploy to Azure Web apps using publish profile credentials.
