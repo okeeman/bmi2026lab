@@ -21,14 +21,25 @@ namespace BMI_Unit_Test
 
         //[DataTestMethod]
         [TestMethod]
-        // 2 rows of data for testing different BMI categories.
+        // 4 rows of data for testing different BMI categories.
+        // what is naming convention for test methods?
         [DataRow(7, 8, 5, 5, BMICategory.Underweight)]
         [DataRow(12, 0, 5, 10, BMICategory.Normal)]
         [DataRow(12, 8, 5, 5, BMICategory.Overweight)]
         [DataRow(15, 0, 5, 10, BMICategory.Obese)]
-        public void TestMethod3(int ws, int wp, int hf, int hi, BMICategory cat)
+        public void TestAllCategories(int ws, int wp, int hf, int hi, BMICategory cat)
         {
             BMI bmi = new BMI() { WeightStones = ws, WeightPounds = wp, HeightFeet = hf, HeightInches = hi };
+            Assert.AreEqual(bmi.BMICategory, cat);
+        }
+
+        // put in another method to test invalid inputs????
+        [TestMethod]
+        // 4 rows of data for testing different BMI categories.
+        [DataRow(2, 8, 5, 5, BMICategory.Underweight)]
+        public void AssertInvalidInputs(int ws, int wp, int hf, int hi, BMICategory cat)
+        {
+            BMI bmi = new () { WeightStones = ws, WeightPounds = wp, HeightFeet = hf, HeightInches = hi };
             Assert.AreEqual(bmi.BMICategory, cat);
         }
     }

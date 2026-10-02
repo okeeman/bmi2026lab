@@ -8,16 +8,19 @@ name: BMI_CI
 # Define environment variables.
 ################################################
 env:
-  AZURE_WEBAPP_NAME: bmi202620260925161550             
-  AZURE_WEBAPP_PACKAGE_PATH: 'bmi2021\published'        
-  ACTIONS_STEP_DEBUG: true
+  AZURE_WEBAPP_NAME:         bmi202620260925161550             
+  AZURE_WEBAPP_PACKAGE_PATH: bmi2021\published   
+  WORKING_DIRECTORY:         bmi2021  
+  # is this necessary? isn't this set in the build step?
+  CONFIGURATION:             Release
+  
+  # could put these in env settings either.
+  ACTIONS_STEP_DEBUG:   true
   ACTIONS_RUNNER_DEBUG: true
-  CONFIGURATION: Release
-  WORKING_DIRECTORY: bmi2021
 
 
 ################################################
-# When is the workflow triggered.
+# ?emoji When is the workflow triggered.
 ################################################
 on:
  workflow_dispatch:                                     
@@ -40,13 +43,13 @@ jobs:
     ################################################     
     steps:
     ################################################
-    # ️⬇️ Checkout code.
+    # ️➡️ Checkout code.
     ################################################
     - name: Checkout code.                            
       uses: actions/checkout@v5
       
     ################################################
-    # ⬇️ Set up .NET.
+    # 🔧 Set up .NET.
     ################################################
     - name: Set up .NET                                 
       uses: actions/setup-dotnet@v5
@@ -67,8 +70,8 @@ jobs:
     - name: Run unit tests
       run: >
         dotnet test BMI_Unit_Test/BMI_Unit_Test.csproj 
-        --no-restore 
         --collect "Code coverage" -l:trx
+        --no-restore 
     
     ################################################
     # 📘 Publish unit tests.
@@ -76,39 +79,41 @@ jobs:
     - name: Publish Unit Test Results
       uses: dorny/test-reporter@v3
       with:
-        artifact: ''
-        name: MS Tests        
-        path: '**.trx'
-        reporter: 'dotnet-trx'   
-        
-    ################################################
-    # ⬆️ Upload test results.
-    ################################################
-    - name: Upload test results
-      uses: actions/upload-artifact@v7
-      with:
-        name: mstest-results
-        path: '**/test_results.trx'
+        name:     MS Tests        
+        path:     '**.trx'
+        reporter: 'dotnet-trx'  
+        artifact: ''        
 
-    #####################################################
+    ########################################################
     # 📘 Publish the app, i.e., create a deployment package.
-    #####################################################
+    ########################################################
     - name: Publish
-      run: >
-        dotnet publish "${{ env.WORKING_DIRECTORY }}" 
+      run: > 
+        dotnet publish  ${{ env.WORKING_DIRECTORY }}
         --configuration ${{ env.CONFIGURATION }} 
+        --output        ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
         --no-build 
-        --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+        
     
-    #############################################################
+    ################################################################
     # ☁️ Deploy to Azure Web apps using publish profile credentials.
-    #############################################################
-    - name: Run Azure webapp deploy action using publish profile credentials
+    ################################################################
+    - name: Deploy
       uses: azure/webapps-deploy@v2
       with: 
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}                         
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} 
-        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}' 
+        app-name:            ${{ env.AZURE_WEBAPP_NAME }}   
+        package:             ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}        
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
        
 
 
